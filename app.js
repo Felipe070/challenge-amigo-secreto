@@ -1,4 +1,5 @@
 let amigos = [];
+let amigosYaSorteados = [];
 
 function limpiarCaja() {
   document.getElementById("amigo").value = "";
@@ -36,13 +37,64 @@ function recorrerAmigos(array) {
 }
 
 function sortearAmigo() {
-  amigos.length == 0 ? alert(`No hay amigos para sortear`) : ""; // verificamos que el array no este vacío
-
-  let numAleatorio = Math.floor(Math.random() * amigos.length); // creamos el num aleatorio
   let resultado = document.getElementById("resultado"); // accedemos al elemento de lista a traves del DOM
-  resultado.innerText = amigos[numAleatorio]; // le asignamos el texto del nombre
+
+  // hacemos 2 if anidados para sortear a todos los amigos de la lista
+  amigos.length == 0
+    ? alert(`No hay amigos para sortear`)
+    : amigosYaSorteados.length != amigos.length
+    ? (resultado.innerText = amigos[generarNumAleatorio()])
+    : (resultado.innerText = "Se sortearon a todos los amigos")(
+        reiniciarJuego()
+      ); // verificamos que el array no este vacío  y le asignamos el texto del nombre
 
   limpiarCaja();
 
   return;
+}
+
+function reiniciarJuego() {
+  document.getElementById("btnAniadir").setAttribute("disabled", "true");
+  let btnReiniciar = document.getElementById("btnSortear");
+  btnReiniciar.innerHTML = `
+    <img id="playImg" src="assets/play_circle_outline.png" alt="Ícono para sortear">
+    Reiniciar
+  `;
+  btnReiniciar.className = "button-draw";
+  btnReiniciar.setAttribute("onclick", "valoresPorDefecto();");
+}
+
+function valoresPorDefecto() {
+  limpiarCaja();
+  amigos = [];
+  amigosYaSorteados = [];
+
+  // volvemos a configurar el boton Añadir
+  document.getElementById("btnAniadir").removeAttribute("disabled");
+  document
+    .getElementById("btnAniadir")
+    .setAttribute("onclick", "agregarAmigo();");
+
+  // volvemos a configurar el boton Sortear
+  let btnSortearAmigo = document.getElementById("btnSortear");
+  btnSortearAmigo.innerHTML = `
+    <img id="playImg" src="assets/play_circle_outline.png" alt="Ícono para sortear">
+    Sortear amigo
+  `;
+  btnSortearAmigo.setAttribute("onclick", "sortearAmigo();");
+  btnSortearAmigo.className = "button-draw";
+
+  // limpiamos las listas previas
+  document.getElementById("resultado").innerHTML = "";
+  document.getElementById("listaAmigos").innerHTML = "";
+}
+
+function generarNumAleatorio() {
+  let numAleatorio = Math.floor(Math.random() * amigos.length); // genera un número aleatorio
+
+  if (amigosYaSorteados.includes(numAleatorio)) {
+    return generarNumAleatorio(); // si el número ya fue usado, generamos otro
+  }
+  amigosYaSorteados.push(numAleatorio); // agregamos el número generado al array de números usados
+  return numAleatorio;
 }
